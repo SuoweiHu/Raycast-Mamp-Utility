@@ -36,6 +36,7 @@
   "license": "MIT",
   "dependencies": {
     "@raycast/api": "^1.74.0",
+    "@raycast/utils": "github:raycast/utils",
     "mysql": "^2.18.1",
     "mysql2": "^3.9.7",
     "untildify": "^4.0.0"
