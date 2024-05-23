@@ -3,14 +3,14 @@
     {
       "name": "manage-site",
       "title": "debug - Manage Website",
-      "description": "Search and organize your downloaded files",
+      "description": "Search Websites",
       "mode": "view"
     },
     {
       "name": "manage-database",
       "title": "debug - Manage Database",
       "description": "Open phpMyAdmin",
-      "mode": "no-view"
+      "mode": "view"
     }
   ],
   "preferences": [
@@ -37,6 +37,7 @@
   "dependencies": {
     "@raycast/api": "^1.74.0",
     "mysql": "^2.18.1",
+    "mysql2": "^3.9.7",
     "untildify": "^4.0.0"
   },
   "devDependencies": {
