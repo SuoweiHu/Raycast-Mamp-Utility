@@ -1,0 +1,59 @@
+{
+  "commands": [
+    {
+      "name": "manage-site",
+      "title": "debug - Manage Website",
+      "description": "Search and organize your downloaded files",
+      "mode": "view"
+    },
+    {
+      "name": "manage-database",
+      "title": "debug - Manage Database",
+      "description": "Open phpMyAdmin",
+      "mode": "no-view"
+    }
+  ],
+  "preferences": [
+    {
+      "type": "directory",
+      "name": "siteFolder",
+      "title": "Site Folder",
+      "description": "The folder where your MAMP website are stored",
+      "default": "~/Sites",
+      "required": true
+    }
+  ],
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "mamp-utility",
+  "title": "MAMP Utility",
+  "description": "Search and organize your MAMP hosted website.",
+  "icon": "mamp.png",
+  "author": "suowei_hu_",
+  "categories": [
+    "Productivity",
+    "System"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@raycast/api": "^1.74.0",
+    "mysql": "^2.18.1",
+    "untildify": "^4.0.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/mysql": "^2.15.26",
+    "@types/node": "^20.8.10",
+    "@types/react": "^18.2.27",
+    "eslint": "^7.32.0",
+    "prettier": "^2.5.1",
+    "react": "^18.2.0",
+    "typescript": "^4.4.3"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "ray publish"
+  }
+}
