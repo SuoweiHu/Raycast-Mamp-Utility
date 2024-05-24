@@ -20,11 +20,32 @@
   "preferences": [
     {
       "type": "directory",
-      "name": "siteFolder",
+      "name": "pref_siteFolder",
       "title": "Site Folder",
       "description": "The folder where your MAMP website are stored",
       "default": "~/Sites",
       "required": true
+    },{
+        "type": "textfield",
+        "name": "pref_mysqlPort",
+        "description": "The MySQL Port (can be found in \"Port & User\")",
+        "title": "MySQL Port",
+        "default": "8889",
+        "required": true
+    },{
+        "type": "textfield",
+        "name": "pref_apachePort",
+        "title": "Apache Port",
+        "description": "The Apache Port (can be found in \"Port & User\")",
+        "default": "8888",
+        "required": true
+    },{
+        "type": "textfield",
+        "name": "pref_nginxPort",
+        "description": "The Nginx Port (can be found in \"Port & User\")",
+        "title": "Nginx Port",
+        "default": "7888",
+        "required": true
     }
   ],
   "$schema": "https://www.raycast.com/schemas/extension.json",
