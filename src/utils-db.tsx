@@ -14,14 +14,16 @@ export async function get_databases(update_DBs:Function):Promise<boolean>{
 
         // Establish connection and retrive the databases
         connection.connect((err:any) => {
-            if (err==true) { return console.error('[MYSQL] error connecting: ' + err.stack);                        }
-            else {              /*console.log(  '[MYSQL] connected to database (thred-id=' + connection.threadId);*/}
+            if (err==true) {
+                return console.error('[MYSQL] error connecting: ' + err.stack);
+            }
         });
         connection.query("SHOW DATABASES;",(err:any, result) => {
             let temp_dbs = []
-            if (err==true) { return console.error('[MYSQL] error connecting: ' + err.stack);   }
+            if (err==true) {
+                return console.error('[MYSQL] error connecting: ' + err.stack);
+            }
             else{
-                /* console.log(  '[MYSQL] result: ' + Object.keys(result)); */
                 for (let i = 0; i < result.length; i++) {
                     const _RoWDataPacket_ = result[i];
                     const _Database_      = _RoWDataPacket_["Database"];
