@@ -1,8 +1,10 @@
 import untildify from "untildify";
-import { ActionPanel, Action, List, getPreferenceValues, Color, Icon, useNavigation } from "@raycast/api";
-import { open_Folder_InVSCode } from "./utils-open";
-import { getFiles } from "./utils";
+import { ActionPanel, Action, List, Color, Icon, Detail, useNavigation } from "@raycast/api";
+import { get_FolderPaths, open_File_InVSCode, open_Folder_InVSCode } from "./utils-open";
+import { getFiles } from "./utils-file";
 import { useState } from "react";
+import { get_pref_siteFolder } from "./utils-preference";
+import path from "node:path";
 
 
 /**
@@ -13,7 +15,7 @@ import { useState } from "react";
 * -  React component representing an ActionPanel with sections for different actions like opening the file, navigating, copying path, revealing in Finder, and opening with other applications.
 */
 function ListFile_Item_Action(props:any){
-    const { push, pop } = useNavigation();
+    const {push, pop} = useNavigation();
     return(
         <ActionPanel>
             <ActionPanel.Section title="Open">
@@ -92,22 +94,34 @@ function ListFile_Item(props: any) {
 * -  React component - A list of files rendered as a React component.
 */
 function ListFiles(props: any) {
-	const [_listFiles_, set_listFiles_] = useState(getFiles(untildify(props._path_)));
-	return (
-		<List>
-			{_listFiles_.length === 0 && ( <List.EmptyView title="No file found" description="" />       )}
-			{_listFiles_.map((file) => (    <ListFile_Item file={file} key={file.path} />               ))}
-		</List>
-	);
+    try{
+	    const _listFiles_ = getFiles(untildify(props._path_));
+        const _listFiles_sorted = _listFiles_.sort((file_a, file_b)=>{return file_a.file.localeCompare(file_b.file);});
+        return (
+            <List>
+                {_listFiles_sorted.length === 0 && ( <List.EmptyView title="No file found" description="" />       )}
+                {_listFiles_sorted.map((file) => (    <ListFile_Item file={file} key={file.path} />               ))}
+            </List>
+        );
+    } catch(error:any){
+        if(error.message.includes("not a directory")){
+            const file_path     = props._path_;
+            const folder_path_s = get_FolderPaths(props._path_);
+            const folder_path   = "/" + folder_path_s[folder_path_s.length - 1];
+            open_File_InVSCode(file_path, folder_path);
+            return;
+        } else {
+            return (<Detail markdown={`**ERROR !!!** \n ${error.message}`} />)
+        }
+    }
 }
 
 
 /**
- * This function exports a default component that retrieves preference values using the getPreferenceValues function and renders a ListFiles component with the specified path based on the siteFolder preference.
+ * This function exports a default component that retrieves preference values using the getPreferenceValues function and renders a ListFiles component with the specified path based on the pref_siteFolder preference.
  * Returns:
- * - A ListFiles component with the path specified by the siteFolder preference.
+ * - A ListFiles component with the path specified by the pref_siteFolder preference.
  */
 export default () => {
-	const preferences: Preferences = getPreferenceValues();
-	return <ListFiles _path_={preferences.siteFolder} />;
+	return <ListFiles _path_={get_pref_siteFolder()} />;
 }
