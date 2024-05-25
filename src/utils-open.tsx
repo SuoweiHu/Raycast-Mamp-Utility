@@ -1,7 +1,6 @@
 import path from 'path';
 import { Toast, open, showHUD, showToast } from "@raycast/api";
 import { exec } from "child_process";
-import { setTimeout } from "node:timers/promises";
 
 export async function open_Url_InChrome(_url_:string, _app_:string="com.google.Chrome"){
     await open(_url_, _app_);
