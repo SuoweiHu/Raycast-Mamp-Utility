@@ -1,8 +1,9 @@
-import { open, popToRoot, showHUD, showToast } from "@raycast/api";
+import { Toast, open, popToRoot, showHUD, showToast } from "@raycast/api";
 import { exec } from "child_process";
 import { wait } from "./utils-time";
 import { open_Url_InChrome } from "./utils-open";
 import { get_pref_apachePort } from "./utils-preference";
+import { title } from "process";
 
 export const system_db = ["performance_schema","information_schema","mydb","mysql","sys"];
 
@@ -100,7 +101,7 @@ export async function create_database(db:string, openAfter:boolean=false){
 export async function delete_database(db:string){
     if(system_db.includes(db)){
         await showHUD("⚠️ Error: deleting system database");
-        return;
+        popToRoot();
     }
     try {
         const cmd = `/Applications/MAMP/Library/bin/mysql -u root -proot -e "DROP DATABASE ${db}"`;
@@ -111,6 +112,41 @@ export async function delete_database(db:string){
         });
     } catch (error:any) {
         await showHUD("⚠️ Failure delete DB: " + db);
+        popToRoot();
+    }
+}
+
+export async function import_database(db:string, path:string){
+    if(system_db.includes(db)){
+        await showHUD("⚠️ Error: importing to system database");
+        popToRoot();
+    }
+    try {
+        const cmd_1 = `/Applications/MAMP/Library/bin/mysql -u root -proot -e "DROP DATABASE ${db}"`;
+        const cmd_2 = `/Applications/MAMP/Library/bin/mysql -u root -proot -e "CREATE DATABASE ${db}"`;
+        const cmd_3 = `/Applications/MAMP/Library/bin/mysql -u root -proot ${db} < "${path}"`;
+        exec( cmd_1, (err, stdout, stderr)=>{
+            showToast({title:"Deleting Existing Database", style:Toast.Style.Animated})
+            if(err){showHUD("⚠️ Failure deleting database: " + db);return;}
+            else{
+                showToast({title:"Creating Empty Database", style:Toast.Style.Animated})
+                exec( cmd_2, (err, stdout, stderr)=>{
+                    if(err){showHUD("⚠️ Failure creating database: " + db);return;}
+                    else{
+                        showToast({title:"Importing Database", style:Toast.Style.Animated})
+                        exec( cmd_3, (err, stdout, stderr)=>{
+                            if(err){showHUD("⚠️ Failure importing database: " + db);return;}
+                            else{
+                                showHUD("SUCCESS");
+                                popToRoot();
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    } catch (error:any) {
+        await showHUD("⚠️ Failure importing DB: " + db);
         popToRoot();
     }
 }

@@ -1,8 +1,9 @@
-import { Action, ActionPanel, Alert, Color, Form, Icon, List, OpenAction, Toast, confirmAlert, popToRoot, showHUD, showToast, useNavigation } from "@raycast/api";
-import { create_database, delete_database, export_database, get_databases } from "./utils-db";
+import { Action, ActionPanel, Alert, Clipboard, Color, Form, Icon, List, OpenAction, Toast, confirmAlert, popToRoot, showHUD, showToast, useNavigation } from "@raycast/api";
+import { create_database, delete_database, export_database, get_databases, import_database } from "./utils-db";
 import { useEffect, useState } from "react";
 import { exec } from "child_process";
 import { getCurrentFormattedTime } from "./utils-time";
+import { get_pref_apachePort } from "./utils-preference";
 
 
 
@@ -62,6 +63,35 @@ function FormCreateDB(props:any|null){
         </Form>
     );
 }
+function FormImportDB(props:any|null){
+    let cp_text:string|undefined = "";
+    Clipboard.readText().then((data:string|undefined)=>{cp_text=data;return;});
+    return(
+        <Form
+            enableDrafts={false}
+            navigationTitle={"Import Database"}
+            isLoading={true}
+            actions={<ActionPanel> <Action.SubmitForm title="Submit" onSubmit={(data)=>{import_database(data.db_name, data.path)}}/> </ActionPanel>}>
+            <Form.TextField
+                id          ={"db_name"}
+                title       ={"Database Name"}
+                value       = {props.db}
+                />
+            {/* <Form.TextField
+                id          ={"path"}
+                autoFocus   ={true}
+                title       ={"Importing File \n(PATH)"}
+                value       ={cp_text==undefined?"":cp_text}
+            /> */}
+            <Form.FilePicker
+                id          ={"path"}
+                autoFocus   ={true}
+                title       ={"Importing File \n(PATH)"}
+            />
+        </Form>
+    );
+}
+
 
 /**
  * Generates an Action Panel component for managing database actions in a web application.
@@ -73,6 +103,11 @@ function ListDB_Actions(props:{db:string}){
     const db = props.db;
     return(
         <ActionPanel>
+        <Action.OpenInBrowser
+            title="Open in phpMyAdmin"
+            shortcut={{modifiers:["cmd"], key:"c"}}
+            url={"http://localhost:"+get_pref_apachePort()+"/phpMyAdmin5/"}
+        />
         <ActionPanel.Section title="Clipboard">
             <Action.CopyToClipboard
                 title="Copy Drupal Database Configuration"
@@ -90,7 +125,7 @@ function ListDB_Actions(props:{db:string}){
                 title="Create Database"
                 icon={Icon.PlusCircle}
                 shortcut={{modifiers:["cmd"], key:"n"}}
-                onAction={()=>{push(<FormCreateDB></FormCreateDB>)}}
+                onAction={()=>{push(<FormCreateDB/>)}}
             />
             <Action
                 title="Delete Database"
@@ -127,8 +162,8 @@ function ListDB_Actions(props:{db:string}){
             <Action
                 title="Import Database"
                 icon={Icon.ArrowRightCircle}
-                onAction={()=>{}}
                 shortcut={{modifiers:["cmd"], key:"i"}}
+                onAction={()=>{push(<FormImportDB db={db}/>)}}
             />
             {/* <Action
                 title="Import Database (and Reveal in phpMyAdmin)"
