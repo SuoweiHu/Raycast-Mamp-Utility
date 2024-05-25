@@ -6,7 +6,21 @@ import { getCurrentFormattedTime } from "./utils-time";
 
 
 
-
+/**
+ * React functional component that renders a list of databases.
+ * It fetches the databases using the 'get_databases' function on component mount and sorts them using the 'sort_db' function from './utils-db'.
+ *
+ * @returns JSX element representing a list of databases with ListDB components for each database.
+ *
+ * @remarks
+ * - No input parameters.
+ * - Uses React hooks to manage state with useState for 'dbs' array.
+ * - Utilizes useEffect hook to fetch databases on component mount.
+ * - Renders a loading indicator if 'dbs' array is empty.
+ * - Sorts the databases alphabetically before mapping them to ListDB components.
+ *
+ * @note This function assumes the existence of 'get_databases' and 'sort_db' functions.
+ */
 export default function Command(){
     const [dbs, set_DBs] = useState<string[]>([]);
     const {sort_db} = require("./utils-db");
@@ -38,15 +52,7 @@ function FormCreateDB(props:any|null){
             enableDrafts={false}
             navigationTitle={"Create Database"}
             isLoading={true}
-            actions={
-                <ActionPanel>
-                    <Action.SubmitForm
-                        title="Submit"
-                        onSubmit={(data)=>{create_database(data.db_name)}}
-                    />
-                </ActionPanel>
-            }
-        >
+            actions={<ActionPanel> <Action.SubmitForm title="Submit" onSubmit={(data)=>{create_database(data.db_name)}}/> </ActionPanel>}>
             <Form.TextField
                 id          ={"db_name"}
                 autoFocus   ={true}
@@ -57,11 +63,98 @@ function FormCreateDB(props:any|null){
     );
 }
 
+/**
+ * Generates an Action Panel component for managing database actions in a web application.
+ * @param props An object containing the 'db' property as a string specifying the database name.
+ * @returns JSX element representing the Action Panel component with sections for Clipboard, Create/Delete, and Export/Import actions.
+ */
+function ListDB_Actions(props:{db:string}){
+    const {push, pop} = useNavigation();
+    const db = props.db;
+    return(
+        <ActionPanel>
+        <ActionPanel.Section title="Clipboard">
+            <Action.CopyToClipboard
+                title="Copy Drupal Database Configuration"
+                content={`$databases['default']['default'] = array (\n\t'driver' => 'mysql',\n\t'database' => '${db}',\n\t'username' => 'root',\n\t'password' => 'root',\n\t'prefix' => '',\n\t'host' => '127.0.0.1',\n\t'port' => '8889',\n\t'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',\n\t'unix_socket' => '/Applications/MAMP/tmp/mysql/mysql.sock',\n);\n$settings['trusted_host_patterns'] = array();`}
+                shortcut={{modifiers:["cmd"], key:"c"}}
+            />
+            <Action.CopyToClipboard
+                title="Copy Database Name"
+                content={db}
+                shortcut={{modifiers:["cmd", "ctrl"], key:"c"}}
+            />
+        </ActionPanel.Section>
+        <ActionPanel.Section title="Create/Delete">
+            <Action
+                title="Create Database"
+                icon={Icon.PlusCircle}
+                shortcut={{modifiers:["cmd"], key:"n"}}
+                onAction={()=>{push(<FormCreateDB></FormCreateDB>)}}
+            />
+            <Action
+                title="Delete Database"
+                icon={Icon.MinusCircle}
+                shortcut={{modifiers:["ctrl"], key:"x"}}
+                onAction={async ()=>{confirmAlert({
+                        title: `Confirm DELETE database \n [ ${db} ]`,
+                        icon: Icon.Warning,
+                        primaryAction:{
+                            title:"Confirm",
+                            style: Alert.ActionStyle.Destructive,
+                            onAction: ()=>{delete_database(db);}
+                        },
+                    }
+                )}}
+            />
+        </ActionPanel.Section>
+        <ActionPanel.Section title="Export/Import">
+            <Action
+                title="Export Database"
+                icon={Icon.ArrowRightCircle}
+                onAction={()=>{
+                    showToast({title:"Exporting...", style:Toast.Style.Animated})
+                    export_database(db);
+                }}
+                shortcut={{modifiers:["cmd"], key:"s"}}
+            />
+            {/* <Action
+                title="Export Database (and Reveal in Finder)"
+                icon={Icon.ArrowRightCircle}
+                onAction={()=>{export_database(db, true);}}
+                shortcut={{modifiers:["cmd", "ctrl"], key:"s"}}
+            /> */}
+            <Action
+                title="Import Database"
+                icon={Icon.ArrowRightCircle}
+                onAction={()=>{}}
+                shortcut={{modifiers:["cmd"], key:"i"}}
+            />
+            {/* <Action
+                title="Import Database (and Reveal in phpMyAdmin)"
+                icon={Icon.ArrowRightCircle}
+                onAction={()=>{}}
+                shortcut={{modifiers:["cmd", "ctrl"], key:"i"}}
+            /> */}
+        </ActionPanel.Section>
+        </ActionPanel>
+    );
+}
+
+/**
+ * Function to display a list item representing a database entry.
+ *
+ * @param props - The properties object containing the 'db' property specifying the database name.
+ * @returns A List.Item component with the following properties:
+ *  - key: set to the 'db' value
+ *  - title: set to the 'db' value
+ *  - icon: set based on whether 'db' is included in 'system_db' - Icon.MemoryChip for system databases, Icon.Person for user databases
+ *  - accessories: an array containing a tag object with a value indicating whether the database is a system or user database, and a color representing this distinction
+ *  - actions: rendered using the ListDB_Actions component with the 'db' value passed as a prop
+ */
 function ListDB(props:{db:string}){
     const db = props.db;
     const {system_db} = require("./utils-db");
-    const {push, pop} = useNavigation();
-
 
     return(<List.Item
         key={db}
@@ -71,74 +164,7 @@ function ListDB(props:{db:string}){
             value: system_db.includes(db)? "system"     : "user",
             color: system_db.includes(db)? Color.Purple : Color.Green,
         }}]}
-        actions={
-            <ActionPanel>
-                <ActionPanel.Section title="Clipboard">
-                    <Action.CopyToClipboard
-                        title="Copy Drupal Database Configuration"
-                        content={`$databases['default']['default'] = array (\n\t'driver' => 'mysql',\n\t'database' => '${db}',\n\t'username' => 'root',\n\t'password' => 'root',\n\t'prefix' => '',\n\t'host' => '127.0.0.1',\n\t'port' => '8889',\n\t'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',\n\t'unix_socket' => '/Applications/MAMP/tmp/mysql/mysql.sock',\n);\n$settings['trusted_host_patterns'] = array();`}
-                        shortcut={{modifiers:["cmd"], key:"c"}}
-                    />
-                    <Action.CopyToClipboard
-                        title="Copy Database Name"
-                        content={db}
-                        shortcut={{modifiers:["cmd", "ctrl"], key:"c"}}
-                    />
-                </ActionPanel.Section>
-                <ActionPanel.Section title="Create/Delete">
-                    <Action
-                        title="Create Database"
-                        icon={Icon.PlusCircle}
-                        shortcut={{modifiers:["cmd"], key:"n"}}
-                        onAction={()=>{push(<FormCreateDB></FormCreateDB>)}}
-                    />
-                    <Action
-                        title="Delete Database"
-                        icon={Icon.MinusCircle}
-                        shortcut={{modifiers:["ctrl"], key:"x"}}
-                        onAction={async ()=>{confirmAlert({
-                                title: `Confirm DELETE database \n [ ${db} ]`,
-                                icon: Icon.Warning,
-                                primaryAction:{
-                                    title:"Confirm",
-                                    style: Alert.ActionStyle.Destructive,
-                                    onAction: ()=>{delete_database(db);}
-                                },
-                            }
-                        )}}
-                    />
-                </ActionPanel.Section>
-                <ActionPanel.Section title="Export/Import">
-                    <Action
-                        title="Export Database"
-                        icon={Icon.ArrowRightCircle}
-                        onAction={()=>{
-                            showToast({title:"Exporting...", style:Toast.Style.Animated})
-                            export_database(db);
-                        }}
-                        shortcut={{modifiers:["cmd"], key:"s"}}
-                    />
-                    {/* <Action
-                        title="Export Database (and Reveal in Finder)"
-                        icon={Icon.ArrowRightCircle}
-                        onAction={()=>{export_database(db, true);}}
-                        shortcut={{modifiers:["cmd", "ctrl"], key:"s"}}
-                    /> */}
-                    <Action
-                        title="Import Database"
-                        icon={Icon.ArrowRightCircle}
-                        onAction={()=>{}}
-                        shortcut={{modifiers:["cmd"], key:"i"}}
-                    />
-                    {/* <Action
-                        title="Import Database (and Reveal in phpMyAdmin)"
-                        icon={Icon.ArrowRightCircle}
-                        onAction={()=>{}}
-                        shortcut={{modifiers:["cmd", "ctrl"], key:"i"}}
-                    /> */}
-                </ActionPanel.Section>
-            </ActionPanel>
-        }
+        actions={<ListDB_Actions db={db}/>}
     />);
 }
 
