@@ -1,6 +1,8 @@
 import { open, showHUD } from "@raycast/api";
 import { exec } from "child_process";
 import { wait } from "./utils-time";
+import { open_Url_InChrome } from "./utils-open";
+import { get_pref_apachePort } from "./utils-preference";
 
 export const system_db = ["performance_schema","information_schema","mydb","mysql","sys"];
 
@@ -54,15 +56,8 @@ export async function get_databases(set_dbList:Function):Promise<boolean>{
 }
 
 
-export async function export_database(db:string){
-    const sys_dbs:string[] = [
-        "performance_schema",
-        "information_schema",
-        "mydb",
-        "mysql",
-        "sys"
-    ]
-    if(sys_dbs.includes(db)){
+export async function export_database(db:string, openAfter:boolean=false){
+    if(system_db.includes(db)){
         await showHUD("⚠️ Failure exporting system database: " + db);
     }
     try {
@@ -73,10 +68,28 @@ export async function export_database(db:string){
         const export_cmd    = `/Applications/MAMP/Library/bin/mysqldump -u root -proot ${db} > ${export_path}`;
         exec(export_cmd, (err, stdout, stderr)=>{
             if(err){showHUD("Failure exporting database: " + err);}
-            open(export_folder);
+            if(openAfter){open(export_folder);}
             showHUD("Successfully exported datbase: " + db);
         });
     } catch (error:any) {
         await showHUD("⚠️ Failure exporting database: " + error);
     }
 }
+
+
+export async function create_database(db:string, openAfter:boolean=false){
+    if(system_db.includes(db)){
+        await showHUD("⚠️ Failure creating system database: " + db);
+    }
+    try {
+        const cmd = `/Applications/MAMP/Library/bin/mysql -u root -proot -e "CREATE DATABASE ${db}"`;
+        exec(cmd, (err, stdout, stderr)=>{
+            if(err){showHUD("Failure create database: " + err);}
+            if(openAfter){open_Url_InChrome("http://localhost:"+get_pref_apachePort()+"/phpMyAdmin5/");}
+            showHUD("Successfully created datbase: " + db);
+        });
+    } catch (error:any) {
+        await showHUD("⚠️ Failure create database: " + error);
+    }
+}
+
