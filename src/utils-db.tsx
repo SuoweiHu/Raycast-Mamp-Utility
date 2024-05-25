@@ -1,4 +1,4 @@
-import { open, showHUD } from "@raycast/api";
+import { open, popToRoot, showHUD, showToast } from "@raycast/api";
 import { exec } from "child_process";
 import { wait } from "./utils-time";
 import { open_Url_InChrome } from "./utils-open";
@@ -10,13 +10,11 @@ export const system_db = ["performance_schema","information_schema","mydb","mysq
 export function sort_db(db_a:string, db_b:string):number{
     // First check if db_a/db_b is system db
     if(system_db.includes(db_a)){ return +1; }
-
     // Then compare the name
     if(db_a < db_b){              return -1;
     } else if(db_a > db_b){       return +1;
     } else {                      return  0; }
 }
-
 
 export async function get_databases(set_dbList:Function):Promise<boolean>{
     const mysql=require("mysql");
@@ -58,7 +56,8 @@ export async function get_databases(set_dbList:Function):Promise<boolean>{
 
 export async function export_database(db:string, openAfter:boolean=false){
     if(system_db.includes(db)){
-        await showHUD("⚠️ Failure exporting system database: " + db);
+        await showHUD("⚠️ Error: exporting system database");
+        popToRoot();
     }
     try {
         const {getCurrentFormattedTime} = require("./utils-time");
@@ -70,16 +69,19 @@ export async function export_database(db:string, openAfter:boolean=false){
             if(err){showHUD("Failure exporting database: " + err);}
             if(openAfter){open(export_folder);}
             showHUD("Successfully exported datbase: " + db);
+            popToRoot();
         });
     } catch (error:any) {
-        await showHUD("⚠️ Failure exporting database: " + error);
+        await showHUD("⚠️ Failure exporting database: " + db);
+        popToRoot();
     }
 }
 
 
 export async function create_database(db:string, openAfter:boolean=false){
     if(system_db.includes(db)){
-        await showHUD("⚠️ Failure creating system database: " + db);
+        await showHUD("⚠️ Error: creating system database");
+        popToRoot();
     }
     try {
         const cmd = `/Applications/MAMP/Library/bin/mysql -u root -proot -e "CREATE DATABASE ${db}"`;
@@ -87,9 +89,30 @@ export async function create_database(db:string, openAfter:boolean=false){
             if(err){showHUD("Failure create database: " + err);}
             if(openAfter){open_Url_InChrome("http://localhost:"+get_pref_apachePort()+"/phpMyAdmin5/");}
             showHUD("Successfully created datbase: " + db);
+            popToRoot();
         });
     } catch (error:any) {
-        await showHUD("⚠️ Failure create database: " + error);
+        await showHUD("⚠️ Failure creating DB: " + db);
+        popToRoot();
     }
 }
+
+export async function delete_database(db:string){
+    if(system_db.includes(db)){
+        await showHUD("⚠️ Error: deleting system database");
+        return;
+    }
+    try {
+        const cmd = `/Applications/MAMP/Library/bin/mysql -u root -proot -e "DROP DATABASE ${db}"`;
+        exec(cmd, (err, stdout, stderr)=>{
+            if(err){showHUD("Failure delete database: " + err);}
+            showHUD("Successfully deleted datbase: " + db);
+            popToRoot();
+        });
+    } catch (error:any) {
+        await showHUD("⚠️ Failure delete DB: " + db);
+        popToRoot();
+    }
+}
+
 

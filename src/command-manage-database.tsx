@@ -1,8 +1,24 @@
-import { Action, ActionPanel, Color, Form, Icon, List, Toast, popToRoot, showHUD, showToast, useNavigation } from "@raycast/api";
-import { create_database, export_database, get_databases } from "./utils-db";
+import { Action, ActionPanel, Alert, Color, Form, Icon, List, OpenAction, Toast, confirmAlert, popToRoot, showHUD, showToast, useNavigation } from "@raycast/api";
+import { create_database, delete_database, export_database, get_databases } from "./utils-db";
 import { useEffect, useState } from "react";
 import { exec } from "child_process";
 import { getCurrentFormattedTime } from "./utils-time";
+
+
+
+
+export default function Command(){
+    const [dbs, set_DBs] = useState<string[]>([]);
+    const {sort_db} = require("./utils-db");
+    useEffect(()=>{get_databases(set_DBs)}, []);
+    return (
+        <List isLoading={dbs.length==0}>
+            {dbs.sort((a,b)=>{return sort_db(a,b)})
+                ?.map((db)=>{return <ListDB key={db} db={db}></ListDB>})
+            }
+        </List>
+    );
+}
 
 /**
 * This function renders a form component for creating a database. It takes in props as input, which can be of type any or null.
@@ -24,7 +40,10 @@ function FormCreateDB(props:any|null){
             isLoading={true}
             actions={
                 <ActionPanel>
-                    <Action.SubmitForm title="Submit" onSubmit={(data)=>{create_database(data.db_name)}} />
+                    <Action.SubmitForm
+                        title="Submit"
+                        onSubmit={(data)=>{create_database(data.db_name)}}
+                    />
                 </ActionPanel>
             }
         >
@@ -32,7 +51,7 @@ function FormCreateDB(props:any|null){
                 id          ={"db_name"}
                 autoFocus   ={true}
                 title       ={"Database Name"}
-                defaultValue={`_${getCurrentFormattedTime()}_`}
+                defaultValue={`${getCurrentFormattedTime()}_`}
             />
         </Form>
     );
@@ -41,7 +60,7 @@ function FormCreateDB(props:any|null){
 function ListDB(props:{db:string}){
     const db = props.db;
     const {system_db} = require("./utils-db");
-    const {push} = useNavigation();
+    const {push, pop} = useNavigation();
 
 
     return(<List.Item
@@ -77,9 +96,16 @@ function ListDB(props:{db:string}){
                         title="Delete Database"
                         icon={Icon.MinusCircle}
                         shortcut={{modifiers:["ctrl"], key:"x"}}
-                        onAction={()=>{
-
-                        }}
+                        onAction={async ()=>{confirmAlert({
+                                title: `Confirm DELETE database \n [ ${db} ]`,
+                                icon: Icon.Warning,
+                                primaryAction:{
+                                    title:"Confirm",
+                                    style: Alert.ActionStyle.Destructive,
+                                    onAction: ()=>{delete_database(db);}
+                                },
+                            }
+                        )}}
                     />
                 </ActionPanel.Section>
                 <ActionPanel.Section title="Export/Import">
@@ -117,16 +143,4 @@ function ListDB(props:{db:string}){
 }
 
 
-export default function Command(){
-    const [dbs, set_DBs] = useState<string[]>([]);
-    const {sort_db} = require("./utils-db");
-    useEffect(()=>{get_databases(set_DBs)}, []);
-    return (
-        <List isLoading={dbs.length==0}>
-            {dbs.sort((a,b)=>{return sort_db(a,b)})
-                ?.map((db)=>{return <ListDB key={db} db={db}></ListDB>})
-            }
-        </List>
-    );
-}
 

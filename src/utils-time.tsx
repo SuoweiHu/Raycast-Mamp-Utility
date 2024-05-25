@@ -16,7 +16,7 @@ export function getCurrentFormattedTime(): string {
     const second = now.getSeconds().toString().padStart(2, '0');
 
     // Constructed format: "YYYY-MM-DDTHHMMSS"
-    return `${year}-${month}-${day}T${hour}${minute}${second}`;
+    return `${year}${month}${day}T${hour}${minute}${second}`;
 }
 
 
