@@ -2,18 +2,23 @@
   "commands": [
     {
       "name": "command-manage-site",
-      "title": "debug - Manage Website",
-      "description": "Search Websites",
+      "title": "MAMP - Manage Website",
+      "description": "Search Websites in the Site Folder",
       "mode": "view"
     },{
       "name": "command-manage-database",
-      "title": "debug - Manage Database",
+      "title": "MAMP - Manage Database",
       "description": "Manage Database using list view",
       "mode": "view"
     },{
         "name": "command-open-phpmyadmin",
-        "title": "debug - Open phpMyAdmin",
+        "title": "MAMP - Open phpMyAdmin",
         "description": "Open phpMyAdmin in browser",
+        "mode": "no-view"
+    },{
+        "name": "command-open-site-folder",
+        "title": "MAMP - Open Site Folder",
+        "description": "Open site folder in finder",
         "mode": "no-view"
     }
   ],

@@ -9,9 +9,18 @@ export async function open_Url_InChrome(_url_:string, _app_:string="com.google.C
 export async function open_Folder_InVSCode(_path_:any){
     try{
         await exec(`code --new-window "${_path_}"`);
-        await showHUD("Successfully opened site in VS Code");
+        await showHUD("SUCCESS");
     } catch {
-        await showHUD("Failure: Please install CLI-Plugin for VS Code");
+        await showHUD("FAILURE");
+    }
+}
+
+export async function open_Folder_InFinder(_path_:any){
+    try{
+        await exec(`open "${_path_}"`);
+        await showHUD("SUCCESS");
+    } catch {
+        await showHUD("FAILURE");
     }
 }
 
@@ -19,9 +28,9 @@ export async function open_File_InVSCode(_file_path_:string, _folder_path_:strin
     try{
         await exec(`code --new-window "${_folder_path_}"`);
         await exec(`code --reuse-window --goto "${_file_path_}"`);
-        await showHUD("Successfully opened site in VS Code");
+        await showHUD("SUCCESS");
     } catch {
-        await showHUD("Failure: Please install CLI-Plugin for VS Code");
+        await showHUD("FAILURE");
     }
 }
 
