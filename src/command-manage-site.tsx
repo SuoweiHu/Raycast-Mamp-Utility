@@ -25,25 +25,27 @@ function ListFile_Item_Action(props:any){
                     target={<ListFiles _path_={props.file.path} />} />
 
                 <Action
-                    title="Open in VS Code"
+                    title="Open in VS Code - 1"
                     icon={Icon.CodeBlock}
                     shortcut={{modifiers:["cmd"], key: "enter"}}
-                    onAction={()=>{open_Folder_InVSCode(props.file.path)}}
-                />
+                    onAction={()=>{open_Folder_InVSCode(props.file.path)}}/>
+                <Action
+                    title="Open in VS Code - 2"
+                    icon={Icon.CodeBlock}
+                    shortcut={{modifiers:["cmd"], key: "o"}}
+                    onAction={()=>{open_Folder_InVSCode(props.file.path)}}/>
             </ActionPanel.Section>
             <ActionPanel.Section title="Navigation">
                 <Action
                     title="Open Current Folder"
                     icon={Icon.ArrowDown}
                     shortcut={{modifiers:["cmd"], key: "]"}}
-                    onAction={()=>{push(<ListFiles _path_={props.file.path} />)}}
-                />
+                    onAction={()=>{push(<ListFiles _path_={props.file.path} />)}}/>
                 <Action
                     title="Exit to Last Folder"
                     icon={Icon.ArrowUp}
                     shortcut={{modifiers:["cmd"], key:"["}}
-                    onAction={pop}
-                />
+                    onAction={pop}/>
             </ActionPanel.Section>
             <ActionPanel.Section title="Other Action">
                 <Action.CopyToClipboard
