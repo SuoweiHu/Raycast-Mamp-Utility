@@ -2,23 +2,23 @@
   "commands": [
     {
       "name": "command-manage-site",
-      "title": "MAMP - Manage Website",
-      "description": "Search Websites in the Site Folder",
+      "title": "Manage Website",
+      "description": "Search MAMP's websites (by default are in 'site' folder)",
       "mode": "view"
     },{
       "name": "command-manage-database",
-      "title": "MAMP - Manage Database",
-      "description": "Manage Database using list view",
+      "title": "Manage Database",
+      "description": "Manage MAMP's database using list view (by default on port 8889)",
       "mode": "view"
     },{
         "name": "command-open-phpmyadmin",
-        "title": "MAMP - Open phpMyAdmin",
-        "description": "Open phpMyAdmin in browser",
+        "title": "Open phpMyAdmin",
+        "description": "Open MAMP's phpMyAdmin in browser",
         "mode": "no-view"
     },{
         "name": "command-open-site-folder",
-        "title": "MAMP - Open Site Folder",
-        "description": "Open site folder in finder",
+        "title": "Open Site Folder",
+        "description": "Open MAMP's site folder in finder",
         "mode": "no-view"
     }
   ],
