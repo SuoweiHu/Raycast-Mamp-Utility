@@ -103,75 +103,72 @@ function ListDB_Actions(props:{db:string}){
     const db = props.db;
     return(
         <ActionPanel>
-        <Action.OpenInBrowser
-            title="Open in phpMyAdmin"
-            shortcut={{modifiers:["cmd"], key:"c"}}
-            url={"http://localhost:"+get_pref_apachePort()+"/phpMyAdmin5/"}
-        />
-        <ActionPanel.Section title="Clipboard">
-            <Action.CopyToClipboard
-                title="Copy Drupal Database Configuration"
-                content={`$databases['default']['default'] = array (\n\t'driver' => 'mysql',\n\t'database' => '${db}',\n\t'username' => 'root',\n\t'password' => 'root',\n\t'prefix' => '',\n\t'host' => '127.0.0.1',\n\t'port' => '8889',\n\t'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',\n\t'unix_socket' => '/Applications/MAMP/tmp/mysql/mysql.sock',\n);\n$settings['trusted_host_patterns'] = array();`}
-                shortcut={{modifiers:["cmd"], key:"c"}}
+            <Action.OpenInBrowser
+                title="Open in phpMyAdmin"
+                url={"http://localhost:"+get_pref_apachePort()+"/phpMyAdmin5/"}
             />
-            <Action.CopyToClipboard
-                title="Copy Database Name"
-                content={db}
-                shortcut={{modifiers:["cmd", "ctrl"], key:"c"}}
-            />
-        </ActionPanel.Section>
-        <ActionPanel.Section title="Create/Delete">
-            <Action
-                title="Create Database"
-                icon={Icon.PlusCircle}
-                shortcut={{modifiers:["cmd"], key:"n"}}
-                onAction={()=>{push(<FormCreateDB/>)}}
-            />
-            <Action
-                title="Delete Database"
-                icon={Icon.MinusCircle}
-                shortcut={{modifiers:["ctrl"], key:"x"}}
-                onAction={async ()=>{confirmAlert({
-                        title: `Confirm DELETE database \n [ ${db} ]`,
-                        icon: Icon.Warning,
-                        primaryAction:{
-                            title:"Confirm",
-                            style: Alert.ActionStyle.Destructive,
-                            onAction: ()=>{delete_database(db);}
-                        },
-                    }
-                )}}
-            />
-        </ActionPanel.Section>
-        <ActionPanel.Section title="Export/Import">
-            <Action
-                title="Export Database"
-                icon={Icon.ArrowRightCircle}
-                onAction={()=>{
-                    showToast({title:"Exporting...", style:Toast.Style.Animated})
-                    export_database(db);
-                }}
-                shortcut={{modifiers:["cmd"], key:"s"}}
-            />
-            {/* <Action
-                title="Export Database (and Reveal in Finder)"
-                icon={Icon.ArrowRightCircle}
-                onAction={()=>{export_database(db, true);}}
-                shortcut={{modifiers:["cmd", "ctrl"], key:"s"}}
-            /> */}
-            <Action
-                title="Import Database"
-                icon={Icon.ArrowRightCircle}
-                shortcut={{modifiers:["cmd"], key:"i"}}
-                onAction={()=>{push(<FormImportDB db={db}/>)}}
-            />
-            {/* <Action
-                title="Import Database (and Reveal in phpMyAdmin)"
-                icon={Icon.ArrowRightCircle}
-                onAction={()=>{}}
-                shortcut={{modifiers:["cmd", "ctrl"], key:"i"}}
-            /> */}
-        </ActionPanel.Section>
+            <ActionPanel.Section title="Database Operation">
+                <Action
+                    title="Create Database"
+                    icon={Icon.PlusCircle}
+                    shortcut={{modifiers:["cmd"], key:"n"}}
+                    onAction={()=>{push(<FormCreateDB/>)}}
+                />
+                <Action
+                    title="Delete Database"
+                    icon={Icon.MinusCircle}
+                    shortcut={{modifiers:["ctrl"], key:"x"}}
+                    onAction={async ()=>{confirmAlert({
+                            title: `Confirm DELETE database \n [ ${db} ]`,
+                            icon: Icon.Warning,
+                            primaryAction:{
+                                title:"Confirm",
+                                style: Alert.ActionStyle.Destructive,
+                                onAction: ()=>{delete_database(db);}
+                            },
+                        }
+                    )}}
+                />
+                <Action
+                    title="Export Database"
+                    icon={Icon.ArrowRightCircle}
+                    onAction={()=>{
+                        showToast({title:"Exporting...", style:Toast.Style.Animated})
+                        export_database(db);
+                    }}
+                    shortcut={{modifiers:["cmd"], key:"s"}}
+                />
+                {/* <Action
+                    title="Export Database (and Reveal in Finder)"
+                    icon={Icon.ArrowRightCircle}
+                    onAction={()=>{export_database(db, true);}}
+                    shortcut={{modifiers:["cmd", "ctrl"], key:"s"}}
+                /> */}
+                <Action
+                    title="Import Database"
+                    icon={Icon.ArrowRightCircle}
+                    shortcut={{modifiers:["cmd"], key:"i"}}
+                    onAction={()=>{push(<FormImportDB db={db}/>)}}
+                />
+                {/* <Action
+                    title="Import Database (and Reveal in phpMyAdmin)"
+                    icon={Icon.ArrowRightCircle}
+                    onAction={()=>{}}
+                    shortcut={{modifiers:["cmd", "ctrl"], key:"i"}}
+                /> */}
+            </ActionPanel.Section>
+            <ActionPanel.Section title="Clipboard Operation">
+                <Action.CopyToClipboard
+                    title="Copy 'settings.php' Configuration"
+                    content={`$databases['default']['default'] = array (\n\t'driver' => 'mysql',\n\t'database' => '${db}',\n\t'username' => 'root',\n\t'password' => 'root',\n\t'prefix' => '',\n\t'host' => '127.0.0.1',\n\t'port' => '8889',\n\t'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',\n\t'unix_socket' => '/Applications/MAMP/tmp/mysql/mysql.sock',\n);\n$settings['trusted_host_patterns'] = array();`}
+                    shortcut={{modifiers:["cmd"], key:"c"}}
+                />
+                <Action.CopyToClipboard
+                    title="Copy Database Name"
+                    content={db}
+                    shortcut={{modifiers:["cmd", "ctrl"], key:"c"}}
+                />
+            </ActionPanel.Section>
         </ActionPanel>
     );
 }
