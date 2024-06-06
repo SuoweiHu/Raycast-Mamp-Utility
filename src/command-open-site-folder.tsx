@@ -1,9 +1,7 @@
-
-import { showHUD } from "@raycast/api";
-import { open_Folder_InFinder, open_Url_InChrome } from "./utils-open";
-import { get_pref_apachePort, get_pref_siteFolder } from "./utils-preference";
+import { open_Folder_InFinder } from "./utils-open";
+import { get_pref_siteFolder } from "./utils-preference";
 
 export default async function Command() {
-    const site_path = get_pref_siteFolder();
-    await open_Folder_InFinder(site_path);
+	const site_path = get_pref_siteFolder();
+	await open_Folder_InFinder(site_path);
 }
